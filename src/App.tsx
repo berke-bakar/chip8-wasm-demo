@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import Chip8Canvas from "./Chip8Canvas";
+import { Canvas } from "@react-three/fiber";
+import { ComputerTable } from "./model/ComputerTable";
+import { Html, OrbitControls } from "@react-three/drei";
+import { useControls } from "leva";
 
 function App() {
   const [worker, setWorker] = useState<Worker | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const currentRomRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
     const newWorker = new Worker(
@@ -114,7 +119,7 @@ function App() {
     const reader = new FileReader();
     reader.onload = function (event) {
       const romData = new Uint8Array(event.target?.result as ArrayBuffer);
-
+      if (currentRomRef.current) currentRomRef.current.textContent = file.name;
       // Send the ROM data to the worker
       worker.postMessage({
         type: "loadRom",
@@ -125,17 +130,62 @@ function App() {
     reader.readAsArrayBuffer(file);
   };
 
+  const { htmlPosition, htmlScale } = useControls({
+    htmlPosition: {
+      // value: [0, 3.22, 0],
+      value: [-0.143, 3.309, -0.181],
+    },
+    htmlScale: {
+      // value: [0.05, 0.09, 1],
+      value: [0.04, 0.06, 1],
+      step: 0.005,
+    },
+  });
+
   return (
-    <div className="App">
-      <h1>Chip8 Emulator</h1>
-      <input
-        ref={fileInputRef}
-        type="file"
-        onChange={handleFileChange}
-        // accept=".c8.ch8"
-      />
-      {worker && <Chip8Canvas worker={worker} />}
-    </div>
+    <>
+      <Canvas>
+        <ambientLight intensity={1} />
+        <directionalLight intensity={1} />
+        <OrbitControls makeDefault />
+        <Suspense>
+          <ComputerTable />
+          <Html transform scale={htmlScale} position={htmlPosition}>
+            <ul className="flex bg-white w-full h-[20px] items-center select-none font-jersey">
+              <li className="border-black border px-2 py-1 cursor-pointer">
+                <label htmlFor="upload" className="cursor-pointer">
+                  <span
+                    // className="cursor-pointer"
+                    aria-hidden="true"
+                  >
+                    Load ROM
+                  </span>
+                  <input
+                    type="file"
+                    id={"upload"}
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+              </li>
+              <li
+                className="grow border-black border px-2 py-1"
+                ref={currentRomRef}
+              >
+                Current ROM:
+              </li>
+              <li className="border-black border px-2 py-1 cursor-pointer">
+                🎮
+              </li>
+              <li className="border-black border px-2 py-1 cursor-pointer">
+                ⚙
+              </li>
+            </ul>
+            {worker && <Chip8Canvas worker={worker} />}
+          </Html>
+        </Suspense>
+      </Canvas>
+    </>
   );
 }
 
