@@ -8,6 +8,14 @@ let timerDuration = 1000 / timerFrequency; // Duration of one timer update in mi
 let lastCpuCycleTime = 0;
 let lastTimerUpdateTime = 0;
 let running = false;
+
+Module.onRuntimeInitialized = function () {
+  chip8Instance = new Module.Chip8();
+  chip8Instance.initialize();
+
+  postMessage({ type: "initialized" });
+};
+
 const runChip8Cycle = (timestamp: number) => {
   if (!chip8Instance || !running) return;
 
@@ -46,17 +54,6 @@ onmessage = (e) => {
   const { type, data } = e.data;
 
   switch (type) {
-    // Init message from main thread
-    case "init":
-      Module.onRuntimeInitialized = function () {
-        chip8Instance = new Module.Chip8();
-        chip8Instance.initialize();
-        console.log("initialized");
-        postMessage({ type: "initialized" });
-      };
-
-      break;
-
     case "loadRom":
       // Load the ROM into the Chip-8 instance
       if (chip8Instance) {

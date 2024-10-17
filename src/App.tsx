@@ -9,18 +9,30 @@ import ScreenToolbar from "./ScreenToolbar";
 
 function App() {
   const [worker, setWorker] = useState<Worker | null>(null);
+  const [isWorkerActive, setIsWorkerActive] = useState(false);
+
+  const handleOnMessage = useCallback(
+    (e: MessageEvent) => {
+      if (e.data.type === "initialized") {
+        setIsWorkerActive(true);
+      }
+    },
+    [setIsWorkerActive]
+  );
 
   useEffect(() => {
     const newWorker = new Worker(
       new URL("./wasm/chip8Worker.ts", import.meta.url)
     );
+    newWorker.addEventListener("message", handleOnMessage);
     setWorker(newWorker);
 
     // Handle cleanup
     return () => {
+      newWorker.removeEventListener("message", handleOnMessage);
       newWorker.terminate();
     };
-  }, []);
+  }, [handleOnMessage]);
 
   const mapKeyToChip8 = useCallback((key: string) => {
     switch (key) {
@@ -77,7 +89,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (worker != null) worker?.postMessage({ type: "init" });
+    // if (worker != null) worker?.postMessage({ type: "init" });
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!worker) return;
       // Map the key to the corresponding Chip-8 input and send to worker
@@ -131,7 +143,7 @@ function App() {
             position={htmlPosition}
             wrapperClass="relative"
           >
-            <ScreenToolbar worker={worker} />
+            <ScreenToolbar worker={worker} isWorkerActive={isWorkerActive} />
             {worker && <Chip8Canvas worker={worker} />}
           </Html>
         </Suspense>

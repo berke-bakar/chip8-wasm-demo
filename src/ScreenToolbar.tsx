@@ -1,6 +1,7 @@
 import React, {
   MouseEvent,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -8,9 +9,10 @@ import React, {
 import { animated, useSpring } from "@react-spring/web";
 type Props = {
   worker: Worker | null;
+  isWorkerActive: boolean;
 };
 
-export default function ScreenToolbar({ worker }: Props) {
+export default function ScreenToolbar({ worker, isWorkerActive }: Props) {
   const currentRomRef = useRef<HTMLLIElement>(null);
   const currentRomName = useRef("");
   const currentCpuSpeedRef = useRef<HTMLSpanElement>(null);
@@ -51,6 +53,9 @@ export default function ScreenToolbar({ worker }: Props) {
       const file = e.target.files?.[0];
       if (!file || !worker) return;
       currentRomName.current = file.name;
+      if (currentRomRef.current) {
+        currentRomRef.current.textContent = `Loading ${currentRomName.current}...`;
+      }
       fileReader.readAsArrayBuffer(file);
     },
     [fileReader, worker]
@@ -141,6 +146,11 @@ export default function ScreenToolbar({ worker }: Props) {
     [worker]
   );
 
+  useEffect(() => {
+    if (isWorkerActive && currentRomRef.current && currentRomName.current == "")
+      currentRomRef.current.textContent = "Emulator initialized successfully!";
+  }, [isWorkerActive]);
+
   return (
     <>
       <ul className="flex bg-white w-full h-[20px] items-center select-none font-jersey">
@@ -156,7 +166,7 @@ export default function ScreenToolbar({ worker }: Props) {
           </label>
         </li>
         <li className="grow border-black border px-2 py-1" ref={currentRomRef}>
-          Current ROM:
+          Initializing CHIP-8 Emulator...
         </li>
         <li
           className="border-black border px-2 py-1 cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
@@ -185,70 +195,78 @@ export default function ScreenToolbar({ worker }: Props) {
             <p>Original CHIP-8</p>
             <table>
               <thead>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                </tr>
               </thead>
-              <tr>
-                <td className="border border-black">1</td>
-                <td className="border border-black">2</td>
-                <td className="border border-black">3</td>
-                <td className="border border-black">C</td>
-              </tr>
-              <tr>
-                <td className="border border-black">4</td>
-                <td className="border border-black">5</td>
-                <td className="border border-black">6</td>
-                <td className="border border-black">D</td>
-              </tr>
-              <tr>
-                <td className="border border-black">7</td>
-                <td className="border border-black">8</td>
-                <td className="border border-black">9</td>
-                <td className="border border-black">E</td>
-              </tr>
-              <tr>
-                <td className="border border-black">A</td>
-                <td className="border border-black">0</td>
-                <td className="border border-black">B</td>
-                <td className="border border-black">F</td>
-              </tr>
+              <tbody>
+                <tr>
+                  <td className="border border-black">1</td>
+                  <td className="border border-black">2</td>
+                  <td className="border border-black">3</td>
+                  <td className="border border-black">C</td>
+                </tr>
+                <tr>
+                  <td className="border border-black">4</td>
+                  <td className="border border-black">5</td>
+                  <td className="border border-black">6</td>
+                  <td className="border border-black">D</td>
+                </tr>
+                <tr>
+                  <td className="border border-black">7</td>
+                  <td className="border border-black">8</td>
+                  <td className="border border-black">9</td>
+                  <td className="border border-black">E</td>
+                </tr>
+                <tr>
+                  <td className="border border-black">A</td>
+                  <td className="border border-black">0</td>
+                  <td className="border border-black">B</td>
+                  <td className="border border-black">F</td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div className="text-center flex flex-col items-stretch grow w-1/2">
             <p>Emulator</p>
             <table>
               <thead>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
+                <tr>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                </tr>
               </thead>
-              <tr>
-                <td className="border border-black">1</td>
-                <td className="border border-black">2</td>
-                <td className="border border-black">3</td>
-                <td className="border border-black">4</td>
-              </tr>
-              <tr>
-                <td className="border border-black">Q</td>
-                <td className="border border-black">W</td>
-                <td className="border border-black">E</td>
-                <td className="border border-black">R</td>
-              </tr>
-              <tr>
-                <td className="border border-black">A</td>
-                <td className="border border-black">S</td>
-                <td className="border border-black">D</td>
-                <td className="border border-black">F</td>
-              </tr>
-              <tr>
-                <td className="border border-black">Z</td>
-                <td className="border border-black">X</td>
-                <td className="border border-black">C</td>
-                <td className="border border-black">V</td>
-              </tr>
+              <tbody>
+                <tr>
+                  <td className="border border-black">1</td>
+                  <td className="border border-black">2</td>
+                  <td className="border border-black">3</td>
+                  <td className="border border-black">4</td>
+                </tr>
+                <tr>
+                  <td className="border border-black">Q</td>
+                  <td className="border border-black">W</td>
+                  <td className="border border-black">E</td>
+                  <td className="border border-black">R</td>
+                </tr>
+                <tr>
+                  <td className="border border-black">A</td>
+                  <td className="border border-black">S</td>
+                  <td className="border border-black">D</td>
+                  <td className="border border-black">F</td>
+                </tr>
+                <tr>
+                  <td className="border border-black">Z</td>
+                  <td className="border border-black">X</td>
+                  <td className="border border-black">C</td>
+                  <td className="border border-black">V</td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
