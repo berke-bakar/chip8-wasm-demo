@@ -3,9 +3,10 @@ import { useState, useEffect, useCallback, Suspense } from "react";
 import Chip8Canvas from "./Chip8Canvas";
 import { Canvas } from "@react-three/fiber";
 import { ComputerTable } from "./model/ComputerTable";
-import { Html, OrbitControls } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import { useControls } from "leva";
 import ScreenToolbar from "./ScreenToolbar";
+import CameraController from "./controller/CameraController";
 
 function App() {
   const [worker, setWorker] = useState<Worker | null>(null);
@@ -119,22 +120,42 @@ function App() {
     };
   }, [mapKeyToChip8, worker]);
 
-  const { htmlPosition, htmlScale } = useControls({
-    htmlPosition: {
-      value: [-0.143, 3.309, -0.181],
-    },
-    htmlScale: {
-      value: [0.04, 0.06, 1],
-      step: 0.005,
-    },
-  });
+  const { htmlPosition, htmlScale, cameraPosition, cameraRotation } =
+    useControls({
+      htmlPosition: {
+        value: [-0.143, 3.309, -0.181],
+      },
+      htmlScale: {
+        value: [0.048, 0.06, 1],
+        step: 0.005,
+      },
+      cameraPosition: {
+        value: [0, 4, 15],
+        step: 0.1,
+      },
+      cameraRotation: {
+        value: [0, 0, 0],
+        step: 0.1,
+      },
+    });
 
   return (
     <>
-      <Canvas>
+      <Canvas
+        camera={{
+          position: cameraPosition,
+          rotation: cameraRotation,
+        }}
+      >
+        {/* <PerspectiveCamera
+          position={cameraPosition}
+          rotation={cameraRotation}
+          makeDefault
+        /> */}
         <ambientLight intensity={1} />
         <directionalLight intensity={1} />
-        <OrbitControls makeDefault />
+        {/* <OrbitControls makeDefault /> */}
+        <CameraController />
         <Suspense>
           <ComputerTable />
           <Html
