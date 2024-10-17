@@ -178,11 +178,80 @@ export default function ScreenToolbar({ worker }: Props) {
       <animated.div
         style={keymapMenuAnimation}
         ref={keymapMenuRef}
-        className="absolute top-[30px] right-[30px] bg-white border border-black p-2 w-[250px] select-none font-jersey hidden"
+        className="absolute top-[30px] right-[30px] bg-white border border-black p-2 w-[300px] select-none font-jersey hidden"
       >
-        <table>
-          <tr></tr>
-        </table>
+        <div className="flex gap-4">
+          <div className="text-center flex flex-col items-stretch grow w-1/2">
+            <p>Original CHIP-8</p>
+            <table>
+              <thead>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+              </thead>
+              <tr>
+                <td className="border border-black">1</td>
+                <td className="border border-black">2</td>
+                <td className="border border-black">3</td>
+                <td className="border border-black">C</td>
+              </tr>
+              <tr>
+                <td className="border border-black">4</td>
+                <td className="border border-black">5</td>
+                <td className="border border-black">6</td>
+                <td className="border border-black">D</td>
+              </tr>
+              <tr>
+                <td className="border border-black">7</td>
+                <td className="border border-black">8</td>
+                <td className="border border-black">9</td>
+                <td className="border border-black">E</td>
+              </tr>
+              <tr>
+                <td className="border border-black">A</td>
+                <td className="border border-black">0</td>
+                <td className="border border-black">B</td>
+                <td className="border border-black">F</td>
+              </tr>
+            </table>
+          </div>
+          <div className="text-center flex flex-col items-stretch grow w-1/2">
+            <p>Emulator</p>
+            <table>
+              <thead>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+              </thead>
+              <tr>
+                <td className="border border-black">1</td>
+                <td className="border border-black">2</td>
+                <td className="border border-black">3</td>
+                <td className="border border-black">4</td>
+              </tr>
+              <tr>
+                <td className="border border-black">Q</td>
+                <td className="border border-black">W</td>
+                <td className="border border-black">E</td>
+                <td className="border border-black">R</td>
+              </tr>
+              <tr>
+                <td className="border border-black">A</td>
+                <td className="border border-black">S</td>
+                <td className="border border-black">D</td>
+                <td className="border border-black">F</td>
+              </tr>
+              <tr>
+                <td className="border border-black">Z</td>
+                <td className="border border-black">X</td>
+                <td className="border border-black">C</td>
+                <td className="border border-black">V</td>
+              </tr>
+            </table>
+          </div>
+        </div>
       </animated.div>
       <animated.div
         style={settingsMenuAnimation}
