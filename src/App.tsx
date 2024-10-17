@@ -5,11 +5,12 @@ import { Canvas } from "@react-three/fiber";
 import { ComputerTable } from "./model/ComputerTable";
 import { Html, OrbitControls } from "@react-three/drei";
 import { useControls } from "leva";
+import { animated, useSpring } from "@react-spring/web";
 
 function App() {
   const [worker, setWorker] = useState<Worker | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const currentRomRef = useRef<HTMLLIElement>(null);
+  const [showMenu, setShowMenu] = useState(false); // Track menu visibility
 
   useEffect(() => {
     const newWorker = new Worker(
@@ -119,7 +120,10 @@ function App() {
     const reader = new FileReader();
     reader.onload = function (event) {
       const romData = new Uint8Array(event.target?.result as ArrayBuffer);
-      if (currentRomRef.current) currentRomRef.current.textContent = file.name;
+      // Set toolbar text
+      if (currentRomRef.current)
+        currentRomRef.current.textContent = `Loaded ROM: ${file.name}`;
+
       // Send the ROM data to the worker
       worker.postMessage({
         type: "loadRom",
@@ -142,6 +146,19 @@ function App() {
     },
   });
 
+  const htmlRef = useRef();
+
+  const handleSettingsClick = useCallback(() => {
+    worker?.postMessage({ type: showMenu ? "resume" : "pause" });
+    setShowMenu((prev) => !prev); // Toggle menu visibility
+  }, [worker, setShowMenu, showMenu]);
+
+  const menuAnimation = useSpring({
+    opacity: showMenu ? 1 : 0,
+    transform: showMenu ? "translateY(0%)" : "translateY(-20%)",
+    config: { tension: 220, friction: 20 },
+  });
+
   return (
     <>
       <Canvas>
@@ -150,7 +167,13 @@ function App() {
         <OrbitControls makeDefault />
         <Suspense>
           <ComputerTable />
-          <Html transform scale={htmlScale} position={htmlPosition}>
+          <Html
+            transform
+            scale={htmlScale}
+            position={htmlPosition}
+            wrapperClass="relative"
+            ref={htmlRef}
+          >
             <ul className="flex bg-white w-full h-[20px] items-center select-none font-jersey">
               <li className="border-black border px-2 py-1 cursor-pointer">
                 <label htmlFor="upload" className="cursor-pointer">
@@ -177,10 +200,23 @@ function App() {
               <li className="border-black border px-2 py-1 cursor-pointer">
                 🎮
               </li>
-              <li className="border-black border px-2 py-1 cursor-pointer">
+              <li
+                className="border-black border px-2 py-1 cursor-pointer"
+                onClick={handleSettingsClick}
+              >
                 ⚙
               </li>
             </ul>
+            <animated.div
+              style={menuAnimation}
+              className="absolute top-[30px] right-0 bg-white border border-black p-2 w-[150px]"
+            >
+              <ul>
+                <li>Change CPU Speed</li>
+                <li>Change Timer Speed</li>
+                <li>Reset</li>
+              </ul>
+            </animated.div>
             {worker && <Chip8Canvas worker={worker} />}
           </Html>
         </Suspense>
