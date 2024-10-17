@@ -153,8 +153,8 @@ export default function ScreenToolbar({ worker, isWorkerActive }: Props) {
 
   return (
     <>
-      <ul className="flex bg-white w-full h-[20px] items-center select-none font-jersey">
-        <li className="border-black border px-2 py-1 cursor-pointer hover:bg-[rgba(0,0,0,0.3)]">
+      <ul className="flex bg-white w-full h-[20px] items-center select-none font-jersey py-2">
+        <li className="border-black border px-2 cursor-pointer hover:bg-[rgba(0,0,0,0.3)]">
           <label htmlFor="upload" className="cursor-pointer">
             <span aria-hidden="true">Load ROM</span>
             <input
@@ -165,11 +165,11 @@ export default function ScreenToolbar({ worker, isWorkerActive }: Props) {
             />
           </label>
         </li>
-        <li className="grow border-black border px-2 py-1" ref={currentRomRef}>
+        <li className="grow border-black border px-2" ref={currentRomRef}>
           Initializing CHIP-8 Emulator...
         </li>
         <li
-          className="border-black border px-2 py-1 cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
+          className="border-black border px-2cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
           id="keymapButton"
           onClick={handleButtonClick}
         >
@@ -177,7 +177,7 @@ export default function ScreenToolbar({ worker, isWorkerActive }: Props) {
         </li>
         <li
           className={
-            "border-black border px-2 py-1 cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
+            "border-black border px-2 cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
           }
           id="settingsButton"
           onClick={handleButtonClick}

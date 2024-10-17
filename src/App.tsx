@@ -8,6 +8,7 @@ import { useControls } from "leva";
 import ScreenToolbar from "./ScreenToolbar";
 import CameraController from "./controller/CameraController";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import LoadingProgress from "./controller/LoadingProgress";
 
 function App() {
   const [worker, setWorker] = useState<Worker | null>(null);
@@ -166,8 +167,7 @@ function App() {
           intensity={directionalLightIntensity}
           color={directionalLightColor}
         />
-        <CameraController />
-        <Suspense>
+        <Suspense fallback={<LoadingProgress />}>
           <ComputerTable />
           <Html
             transform
@@ -178,6 +178,7 @@ function App() {
             <ScreenToolbar worker={worker} isWorkerActive={isWorkerActive} />
             {worker && <Chip8Canvas worker={worker} />}
           </Html>
+          <CameraController />
         </Suspense>
         <EffectComposer>
           <Bloom

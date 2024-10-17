@@ -22,6 +22,12 @@ type GLTFResult = GLTF & {
     ["1._Lamp_meall"]: THREE.MeshStandardMaterial;
   };
 };
+
+const ktx2loader = new KTX2Loader();
+ktx2loader.setTranscoderPath(
+  "https://cdn.jsdelivr.net/gh/pmndrs/drei-assets/basis/"
+);
+
 export function ComputerTable(props: JSX.IntrinsicElements["group"]) {
   const { gl } = useThree();
   const { nodes, materials } = useGLTF(
@@ -29,10 +35,6 @@ export function ComputerTable(props: JSX.IntrinsicElements["group"]) {
     undefined,
     undefined,
     (loader) => {
-      const ktx2loader = new KTX2Loader();
-      ktx2loader.setTranscoderPath(
-        "https://cdn.jsdelivr.net/gh/pmndrs/drei-assets/basis/"
-      );
       ktx2loader.detectSupport(gl);
       loader.setKTX2Loader(ktx2loader);
     }
@@ -119,3 +121,7 @@ export function ComputerTable(props: JSX.IntrinsicElements["group"]) {
     </group>
   );
 }
+
+useGLTF.preload("", undefined, undefined, (loader) => {
+  loader.setKTX2Loader(ktx2loader);
+});
