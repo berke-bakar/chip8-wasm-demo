@@ -1,16 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, useRef, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Chip8Canvas from "./Chip8Canvas";
 import { Canvas } from "@react-three/fiber";
 import { ComputerTable } from "./model/ComputerTable";
 import { Html, OrbitControls } from "@react-three/drei";
 import { useControls } from "leva";
-import { animated, useSpring } from "@react-spring/web";
+import ScreenToolbar from "./ScreenToolbar";
 
 function App() {
   const [worker, setWorker] = useState<Worker | null>(null);
-  const currentRomRef = useRef<HTMLLIElement>(null);
-  const [showMenu, setShowMenu] = useState(false); // Track menu visibility
 
   useEffect(() => {
     const newWorker = new Worker(
@@ -104,59 +102,19 @@ function App() {
     window.addEventListener("keyup", handleKeyUp);
 
     return () => {
-      console.log("Removing event listener");
-
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [worker]);
-
-  // Handle file upload
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !worker) return;
-
-    // Read the ROM file as an ArrayBuffer
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      const romData = new Uint8Array(event.target?.result as ArrayBuffer);
-      // Set toolbar text
-      if (currentRomRef.current)
-        currentRomRef.current.textContent = `Loaded ROM: ${file.name}`;
-
-      // Send the ROM data to the worker
-      worker.postMessage({
-        type: "loadRom",
-        data: { rom: romData },
-      });
-    };
-
-    reader.readAsArrayBuffer(file);
-  };
+  }, [mapKeyToChip8, worker]);
 
   const { htmlPosition, htmlScale } = useControls({
     htmlPosition: {
-      // value: [0, 3.22, 0],
       value: [-0.143, 3.309, -0.181],
     },
     htmlScale: {
-      // value: [0.05, 0.09, 1],
       value: [0.04, 0.06, 1],
       step: 0.005,
     },
-  });
-
-  const htmlRef = useRef();
-
-  const handleSettingsClick = useCallback(() => {
-    worker?.postMessage({ type: showMenu ? "resume" : "pause" });
-    setShowMenu((prev) => !prev); // Toggle menu visibility
-  }, [worker, setShowMenu, showMenu]);
-
-  const menuAnimation = useSpring({
-    opacity: showMenu ? 1 : 0,
-    transform: showMenu ? "translateY(0%)" : "translateY(-20%)",
-    config: { tension: 220, friction: 20 },
   });
 
   return (
@@ -172,51 +130,8 @@ function App() {
             scale={htmlScale}
             position={htmlPosition}
             wrapperClass="relative"
-            ref={htmlRef}
           >
-            <ul className="flex bg-white w-full h-[20px] items-center select-none font-jersey">
-              <li className="border-black border px-2 py-1 cursor-pointer">
-                <label htmlFor="upload" className="cursor-pointer">
-                  <span
-                    // className="cursor-pointer"
-                    aria-hidden="true"
-                  >
-                    Load ROM
-                  </span>
-                  <input
-                    type="file"
-                    id={"upload"}
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                </label>
-              </li>
-              <li
-                className="grow border-black border px-2 py-1"
-                ref={currentRomRef}
-              >
-                Current ROM:
-              </li>
-              <li className="border-black border px-2 py-1 cursor-pointer">
-                🎮
-              </li>
-              <li
-                className="border-black border px-2 py-1 cursor-pointer"
-                onClick={handleSettingsClick}
-              >
-                ⚙
-              </li>
-            </ul>
-            <animated.div
-              style={menuAnimation}
-              className="absolute top-[30px] right-0 bg-white border border-black p-2 w-[150px]"
-            >
-              <ul>
-                <li>Change CPU Speed</li>
-                <li>Change Timer Speed</li>
-                <li>Reset</li>
-              </ul>
-            </animated.div>
+            <ScreenToolbar worker={worker} />
             {worker && <Chip8Canvas worker={worker} />}
           </Html>
         </Suspense>
