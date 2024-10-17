@@ -51,6 +51,7 @@ onmessage = (e) => {
       Module.onRuntimeInitialized = function () {
         chip8Instance = new Module.Chip8();
         chip8Instance.initialize();
+        console.log("initialized");
         postMessage({ type: "initialized" });
       };
 
@@ -110,6 +111,15 @@ onmessage = (e) => {
       if (chip8Instance) {
         chip8Instance.initialize(); // Reinitialize the instance
       }
+      break;
+    case "reset":
+      // Stop the emulator and reset the rom
+      running = false;
+      if (chip8Instance) {
+        chip8Instance.resetProgram(); // Reset program
+      }
+      running = true;
+      requestAnimationFrame(runChip8Cycle);
       break;
 
     default:
