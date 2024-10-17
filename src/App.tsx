@@ -7,6 +7,7 @@ import { Html } from "@react-three/drei";
 import { useControls } from "leva";
 import ScreenToolbar from "./ScreenToolbar";
 import CameraController from "./controller/CameraController";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
 
 function App() {
   const [worker, setWorker] = useState<Worker | null>(null);
@@ -120,24 +121,37 @@ function App() {
     };
   }, [mapKeyToChip8, worker]);
 
-  const { htmlPosition, htmlScale, cameraPosition, cameraRotation } =
-    useControls({
-      htmlPosition: {
-        value: [-0.143, 3.309, -0.181],
-      },
-      htmlScale: {
-        value: [0.048, 0.06, 1],
-        step: 0.005,
-      },
-      cameraPosition: {
-        value: [0, 4, 15],
-        step: 0.1,
-      },
-      cameraRotation: {
-        value: [0, 0, 0],
-        step: 0.1,
-      },
-    });
+  const {
+    htmlPosition,
+    htmlScale,
+    cameraPosition,
+    cameraRotation,
+    directionalLightColor,
+    directionalLightIntensity,
+    studyLampIntensity,
+  } = useControls({
+    htmlPosition: {
+      value: [-0.143, 3.309, -0.181],
+    },
+    htmlScale: {
+      value: [0.048, 0.06, 1],
+      step: 0.005,
+    },
+    cameraPosition: {
+      value: [0, 4, 15],
+      step: 0.1,
+    },
+    cameraRotation: {
+      value: [0, 0, 0],
+      step: 0.1,
+    },
+    directionalLightColor: "#ffffff",
+    directionalLightIntensity: 1,
+    studyLampIntensity: {
+      value: 4.5,
+      step: 0.1,
+    },
+  });
 
   return (
     <>
@@ -147,14 +161,11 @@ function App() {
           rotation: cameraRotation,
         }}
       >
-        {/* <PerspectiveCamera
-          position={cameraPosition}
-          rotation={cameraRotation}
-          makeDefault
-        /> */}
         <ambientLight intensity={1} />
-        <directionalLight intensity={1} />
-        {/* <OrbitControls makeDefault /> */}
+        <directionalLight
+          intensity={directionalLightIntensity}
+          color={directionalLightColor}
+        />
         <CameraController />
         <Suspense>
           <ComputerTable />
@@ -168,6 +179,14 @@ function App() {
             {worker && <Chip8Canvas worker={worker} />}
           </Html>
         </Suspense>
+        <EffectComposer>
+          <Bloom
+            mipmapBlur
+            luminanceThreshold={1}
+            intensity={studyLampIntensity}
+            radius={0.8}
+          />
+        </EffectComposer>
       </Canvas>
     </>
   );
