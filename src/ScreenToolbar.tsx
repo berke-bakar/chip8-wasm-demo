@@ -12,16 +12,31 @@ type Props = {
   isWorkerActive: boolean;
 };
 
+enum MenuButtons {
+  CLOSED = "Closed",
+  KEYMAP = "keymapButton",
+  SETTINGS = "settingsButton",
+  HELP = "helpButton",
+}
+
+enum PlaybackButtons {
+  PLAY = "resume",
+  PAUSE = "pause",
+  STOP = "stop",
+}
+
 export default function ScreenToolbar({ worker, isWorkerActive }: Props) {
   const currentRomRef = useRef<HTMLLIElement>(null);
   const currentRomName = useRef("");
+  const currentRomInputRef = useRef<HTMLInputElement>();
   const currentCpuSpeedRef = useRef<HTMLSpanElement>(null);
   const currentTimerSpeedRef = useRef<HTMLSpanElement>(null);
   const cpuSpeedRangeRef = useRef<HTMLInputElement>(null);
   const timerSpeedRangeRef = useRef<HTMLInputElement>(null);
   const settingsMenuRef = useRef<HTMLDivElement>(null);
   const keymapMenuRef = useRef<HTMLDivElement>(null);
-  const [showMenu, setShowMenu] = useState(0);
+  const helpMenuRef = useRef<HTMLDivElement>(null);
+  const [showMenu, setShowMenu] = useState<MenuButtons>(MenuButtons.CLOSED);
 
   const handleOnRomLoad = useCallback(
     (event: ProgressEvent<FileReader>) => {
@@ -63,53 +78,93 @@ export default function ScreenToolbar({ worker, isWorkerActive }: Props) {
 
   const handleButtonClick = useCallback(
     (e: MouseEvent) => {
-      worker?.postMessage({ type: showMenu ? "resume" : "pause" });
-      if (e.target.id === "keymapButton") {
-        setShowMenu(showMenu == 1 ? 0 : 1); // Toggle keymap menu
-      } else if (e.target.id === "settingsButton") {
-        setShowMenu(showMenu == 2 ? 0 : 2); // Toggle settings menu
-      }
+      worker?.postMessage({
+        type: showMenu !== MenuButtons.CLOSED ? "resume" : "pause",
+      });
+      const selected = (e.target as HTMLLIElement).id as MenuButtons;
+      setShowMenu(showMenu == selected ? MenuButtons.CLOSED : selected);
     },
     [worker, setShowMenu, showMenu]
   );
 
   const handleResetClick = useCallback(() => {
     worker?.postMessage({ type: "reset" });
-    setShowMenu(0);
+    setShowMenu(MenuButtons.CLOSED);
   }, [worker, setShowMenu]);
 
+  const handlePlayback = useCallback(
+    (e: MouseEvent) => {
+      const selected = (e.target as HTMLLIElement).id;
+      worker?.postMessage({ type: selected });
+      if (
+        selected === PlaybackButtons.STOP &&
+        currentRomRef.current &&
+        currentRomInputRef.current
+      ) {
+        currentRomName.current = "";
+        currentRomRef.current.textContent = `Loaded Rom: `;
+        currentRomInputRef.current.value = "";
+      }
+    },
+    [worker]
+  );
+
   const settingsMenuAnimation = useSpring({
-    opacity: showMenu === 2 ? 1 : 0,
-    transform: showMenu === 2 ? "translateY(0%)" : "translateY(-20%)",
+    opacity: showMenu === MenuButtons.SETTINGS ? 1 : 0,
+    transform:
+      showMenu === MenuButtons.SETTINGS ? "translateY(0%)" : "translateY(-20%)",
     config: { tension: 220, friction: 20 },
     onStart: () => {
-      if (showMenu === 2) {
+      if (showMenu === MenuButtons.SETTINGS) {
         settingsMenuRef.current?.classList.remove("hidden");
         keymapMenuRef.current?.classList.add("hidden");
+        helpMenuRef.current?.classList.add("hidden");
       }
     },
     onRest: () => {
       settingsMenuRef.current?.classList.toggle(
         "hidden",
-        showMenu === 0 || showMenu == 1
+        showMenu != MenuButtons.SETTINGS
       );
     },
   });
 
   const keymapMenuAnimation = useSpring({
-    opacity: showMenu === 1 ? 1 : 0,
-    transform: showMenu === 1 ? "translateY(0%)" : "translateY(-20%)",
+    opacity: showMenu === MenuButtons.KEYMAP ? 1 : 0,
+    transform:
+      showMenu === MenuButtons.KEYMAP ? "translateY(0%)" : "translateY(-20%)",
     config: { tension: 220, friction: 20 },
     onStart: () => {
-      if (showMenu === 1) {
+      if (showMenu === MenuButtons.KEYMAP) {
         keymapMenuRef.current?.classList.remove("hidden");
         settingsMenuRef.current?.classList.add("hidden");
+        helpMenuRef.current?.classList.add("hidden");
       }
     },
     onRest: () => {
       keymapMenuRef.current?.classList.toggle(
         "hidden",
-        showMenu === 0 || showMenu == 2
+        showMenu != MenuButtons.KEYMAP
+      );
+    },
+  });
+
+  const helpMenuAnimation = useSpring({
+    opacity: showMenu === MenuButtons.HELP ? 1 : 0,
+    transform:
+      showMenu === MenuButtons.HELP ? "translateY(0%)" : "translateY(-20%)",
+    config: { tension: 220, friction: 20 },
+    onStart: () => {
+      if (showMenu === MenuButtons.HELP) {
+        helpMenuRef.current?.classList.remove("hidden");
+        keymapMenuRef.current?.classList.add("hidden");
+        settingsMenuRef.current?.classList.add("hidden");
+      }
+    },
+    onRest: () => {
+      helpMenuRef.current?.classList.toggle(
+        "hidden",
+        showMenu != MenuButtons.HELP
       );
     },
   });
@@ -162,14 +217,47 @@ export default function ScreenToolbar({ worker, isWorkerActive }: Props) {
               id={"upload"}
               onChange={handleFileChange}
               className="hidden"
+              ref={currentRomInputRef}
             />
           </label>
         </li>
         <li className="grow border-black border px-2" ref={currentRomRef}>
           Initializing CHIP-8 Emulator...
         </li>
+        <li className="border-black border" id="playbackButtons">
+          <ul className="flex tracking-[-0.2em] ">
+            <li
+              className="px-2 grow cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
+              onClick={handlePlayback}
+              id={PlaybackButtons.PLAY}
+            >
+              ▶
+            </li>
+            <li
+              className="px-1 grow cursor-pointer hover:bg-[rgba(0,0,0,0.3)] pt-1"
+              onClick={handlePlayback}
+              id={PlaybackButtons.PAUSE}
+            >
+              <p className="text-xs pointer-events-none">▌▐</p>
+            </li>
+            <li
+              className="px-2 grow cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
+              onClick={handlePlayback}
+              id={PlaybackButtons.STOP}
+            >
+              ◼
+            </li>
+          </ul>
+        </li>
         <li
-          className="border-black border px-2cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
+          className="border-black border px-2 cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
+          id="helpButton"
+          onClick={handleButtonClick}
+        >
+          ?
+        </li>
+        <li
+          className="border-black border px-2 cursor-pointer hover:bg-[rgba(0,0,0,0.3)]"
           id="keymapButton"
           onClick={handleButtonClick}
         >
@@ -320,6 +408,25 @@ export default function ScreenToolbar({ worker, isWorkerActive }: Props) {
             Reset ROM
           </li>
         </ul>
+      </animated.div>
+      <animated.div
+        style={helpMenuAnimation}
+        ref={helpMenuRef}
+        className={
+          "absolute top-[30px] left-0 right-0 mx-auto bg-white border border-black p-2 w-[250px] select-none font-jersey hidden"
+        }
+      >
+        Welcome to my CHIP-8 Emulator. In order to test the machine, you need to
+        have ROMs that can be read and interpretted by CHIP-8 system. Luckily,
+        there are thousands created since late 1970s. You can find a collection
+        of games and demo ROMs from the internet.{" "}
+        <a
+          href="https://github.com/kripod/chip8-roms/tree/master"
+          className="text-blue-600"
+        >
+          Here
+        </a>{" "}
+        is an example collection on GitHub.
       </animated.div>
     </>
   );

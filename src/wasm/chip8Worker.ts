@@ -107,6 +107,11 @@ onmessage = (e) => {
       running = false;
       if (chip8Instance) {
         chip8Instance.initialize(); // Reinitialize the instance
+        chip8Instance.drawGfx = true;
+        postMessage({
+          type: "draw",
+          gfx: chip8Instance.getGfx(), // Send display buffer (gfx) to main thread
+        });
       }
       break;
     case "reset":
