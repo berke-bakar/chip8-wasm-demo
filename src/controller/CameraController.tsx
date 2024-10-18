@@ -34,7 +34,12 @@ const CameraController = () => {
     if (cameraState.headBobbing && actualDis >= 0.5) {
       modified[1] *= Math.abs(Math.sin(state.clock.elapsedTime * 4) * 1.5);
     }
-    const movedPosition = damp3(state.camera.position, modified, 1, delta);
+    const movedPosition = damp3(
+      state.camera.position,
+      modified,
+      cameraState.duration,
+      delta
+    );
     const movedRotation = dampQ(
       state.camera.quaternion,
       stateRotQuat,
