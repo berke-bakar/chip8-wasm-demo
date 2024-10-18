@@ -23,7 +23,7 @@ export const CAMERA_STATES: Array<State> = [
     headBobbing: true,
   },
   {
-    position: [0, 3.4, 0.7],
+    position: [-0.2, 3.4, 0.7],
     rotation: { x: -0.1, y: 0, z: 0 },
     duration: 0.35,
     headBobbing: false,

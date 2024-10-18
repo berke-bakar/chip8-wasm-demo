@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense, useRef } from "react";
 import Chip8Canvas from "./Chip8Canvas";
 import { Canvas } from "@react-three/fiber";
 import { ComputerTable } from "./model/ComputerTable";
@@ -7,8 +7,10 @@ import { Html } from "@react-three/drei";
 import { useControls } from "leva";
 import ScreenToolbar from "./ScreenToolbar";
 import CameraController from "./controller/CameraController";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import { Bloom, EffectComposer, Selection } from "@react-three/postprocessing";
 import LoadingProgress from "./controller/LoadingProgress";
+import { OfficeChair } from "./model/OfficeChair";
+import { DirectionalLight } from "three";
 
 function App() {
   const [worker, setWorker] = useState<Worker | null>(null);
@@ -123,28 +125,18 @@ function App() {
   }, [mapKeyToChip8, worker]);
 
   const {
-    htmlPosition,
-    htmlScale,
-    cameraPosition,
-    cameraRotation,
+    emulatorPosition,
+    emulatorScale,
     directionalLightColor,
     directionalLightIntensity,
     studyLampIntensity,
   } = useControls({
-    htmlPosition: {
+    emulatorPosition: {
       value: [-0.143, 3.309, -0.181],
     },
-    htmlScale: {
+    emulatorScale: {
       value: [0.048, 0.06, 1],
       step: 0.005,
-    },
-    cameraPosition: {
-      value: [0, 4, 15],
-      step: 0.1,
-    },
-    cameraRotation: {
-      value: [0, 0, 0],
-      step: 0.1,
     },
     directionalLightColor: "#ffffff",
     directionalLightIntensity: 1,
@@ -158,8 +150,8 @@ function App() {
     <>
       <Canvas
         camera={{
-          position: cameraPosition,
-          rotation: cameraRotation,
+          position: [0, 4, 15],
+          rotation: [0, 0, 0],
         }}
       >
         <ambientLight intensity={1} />
@@ -168,11 +160,21 @@ function App() {
           color={directionalLightColor}
         />
         <Suspense fallback={<LoadingProgress />}>
+          <EffectComposer>
+            <Bloom
+              intensity={studyLampIntensity}
+              luminanceThreshold={1}
+              radius={0.9}
+              mipmapBlur
+            />
+          </EffectComposer>
+
           <ComputerTable />
+          <OfficeChair />
           <Html
             transform
-            scale={htmlScale}
-            position={htmlPosition}
+            scale={emulatorScale}
+            position={emulatorPosition}
             wrapperClass="relative"
           >
             <ScreenToolbar worker={worker} isWorkerActive={isWorkerActive} />
@@ -180,14 +182,6 @@ function App() {
           </Html>
           <CameraController />
         </Suspense>
-        <EffectComposer>
-          <Bloom
-            mipmapBlur
-            luminanceThreshold={1}
-            intensity={studyLampIntensity}
-            radius={0.8}
-          />
-        </EffectComposer>
       </Canvas>
     </>
   );
