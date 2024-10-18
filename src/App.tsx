@@ -7,10 +7,10 @@ import { Html } from "@react-three/drei";
 import { useControls } from "leva";
 import ScreenToolbar from "./ScreenToolbar";
 import CameraController from "./controller/CameraController";
-import { Bloom, EffectComposer, Selection } from "@react-three/postprocessing";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import LoadingProgress from "./controller/LoadingProgress";
 import { OfficeChair } from "./model/OfficeChair";
-import { DirectionalLight } from "three";
+import AudioController from "./controller/AudioController";
 
 function App() {
   const [worker, setWorker] = useState<Worker | null>(null);
@@ -179,6 +179,7 @@ function App() {
           >
             <ScreenToolbar worker={worker} isWorkerActive={isWorkerActive} />
             {worker && <Chip8Canvas worker={worker} />}
+            <AudioController />
           </Html>
           <CameraController />
         </Suspense>
