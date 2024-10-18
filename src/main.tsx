@@ -7,6 +7,6 @@ import { Leva } from "leva";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <App />
-    <Leva />
+    <Leva collapsed />
   </StrictMode>
 );
