@@ -5,7 +5,7 @@ declare const Module: any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare type Chip8 = any;
 
-self.importScripts("./Chip8.js"); // Replace with actual file path
+self.importScripts("/Chip8.js"); // Replace with actual file path
 
 let chip8Instance: Chip8 | null = null;
 let cpuFrequency = 600; // Default CPU frequency (in Hz)
