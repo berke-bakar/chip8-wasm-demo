@@ -9,12 +9,5 @@
         }
       ]
     }
-  ],
-  "redirects": [
-    {
-      "source": "/assets/:filePath",
-      "destination": "/:filePath",
-      "permanent": true
-    }
   ]
 }
