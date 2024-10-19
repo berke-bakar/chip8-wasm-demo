@@ -1,4 +1,4 @@
-self.importScripts("/Chip8.js"); // Replace with actual file path
+self.importScripts(`${self.location.origin}/Chip8.js`);
 
 let chip8Instance = null;
 let cpuFrequency = 600; // Default CPU frequency (in Hz)
