@@ -26,7 +26,7 @@ function App() {
   );
 
   useEffect(() => {
-    const newWorker = new Worker(new URL("/chip8Worker.ts", import.meta.url));
+    const newWorker = new Worker(new URL("/chip8Worker.js", import.meta.url));
     newWorker.addEventListener("message", handleOnMessage);
     setWorker(newWorker);
 

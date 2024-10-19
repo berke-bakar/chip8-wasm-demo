@@ -1,13 +1,6 @@
-/// <reference lib="webworker" />
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const Module: any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare type Chip8 = any;
-
 self.importScripts("/Chip8.js"); // Replace with actual file path
 
-let chip8Instance: Chip8 | null = null;
+let chip8Instance = null;
 let cpuFrequency = 600; // Default CPU frequency (in Hz)
 let timerFrequency = 60; // Default Timer frequency (in Hz)
 let cpuCycleDuration = 1000 / cpuFrequency; // Duration of one CPU cycle in milliseconds
@@ -23,7 +16,7 @@ Module.onRuntimeInitialized = function () {
   postMessage({ type: "initialized" });
 };
 
-const runChip8Cycle = (timestamp: number) => {
+const runChip8Cycle = (timestamp) => {
   if (!chip8Instance || !running) return;
 
   // We process multiple cycles as requestAnimationFrame is slower than the CHIP8 CPU we emulate
