@@ -36,7 +36,7 @@ const CameraController = () => {
     }
     const movedPosition = damp3(
       state.camera.position,
-      modified,
+      modified as [x: number, y: number, z: number],
       cameraState.duration,
       delta
     );

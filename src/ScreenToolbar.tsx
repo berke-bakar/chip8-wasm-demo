@@ -28,7 +28,7 @@ enum PlaybackButtons {
 export default function ScreenToolbar({ worker, isWorkerActive }: Props) {
   const currentRomRef = useRef<HTMLLIElement>(null);
   const currentRomName = useRef("");
-  const currentRomInputRef = useRef<HTMLInputElement>();
+  const currentRomInputRef = useRef<HTMLInputElement>(null);
   const currentCpuSpeedRef = useRef<HTMLSpanElement>(null);
   const currentTimerSpeedRef = useRef<HTMLSpanElement>(null);
   const cpuSpeedRangeRef = useRef<HTMLInputElement>(null);

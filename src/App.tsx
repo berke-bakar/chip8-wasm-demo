@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, useCallback, Suspense, useRef } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Chip8Canvas from "./Chip8Canvas";
 import { Canvas } from "@react-three/fiber";
 import { ComputerTable } from "./model/ComputerTable";
@@ -94,7 +94,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // if (worker != null) worker?.postMessage({ type: "init" });
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!worker) return;
       // Map the key to the corresponding Chip-8 input and send to worker

@@ -40,7 +40,7 @@ export function ComputerTable(props: JSX.IntrinsicElements["group"]) {
     }
   ) as GLTFResult;
 
-  const lampMaterialRef = useRef<THREE.MeshBasicMaterial>();
+  const lampMaterialRef = useRef<THREE.MeshBasicMaterial>(null);
   const firstColorEdit = useRef(true);
 
   useControls({
@@ -122,6 +122,11 @@ export function ComputerTable(props: JSX.IntrinsicElements["group"]) {
   );
 }
 
-useGLTF.preload("", undefined, undefined, (loader) => {
-  loader.setKTX2Loader(ktx2loader);
-});
+// useGLTF.preload("/computerTable.glb", undefined, undefined, (loader) => {
+//   const ktx2loader = new KTX2Loader();
+//   ktx2loader.setTranscoderPath(
+//     "https://cdn.jsdelivr.net/gh/pmndrs/drei-assets/basis/"
+//   );
+//   // ktx2loader.detectSupport(gl);
+//   loader.setKTX2Loader(ktx2loader);
+// });

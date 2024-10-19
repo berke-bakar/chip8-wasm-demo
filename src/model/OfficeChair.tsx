@@ -16,8 +16,8 @@ type GLTFResult = GLTF & {
 
 export function OfficeChair(props: JSX.IntrinsicElements["group"]) {
   const { nodes, materials } = useGLTF("/officeChair.glb") as GLTFResult;
-  const groupRef = useRef<THREE.Group>();
-  const meshRef = useRef<THREE.Mesh>();
+  const groupRef = useRef<THREE.Group>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
   const isMoved = useRef(false);
   const isReachedTarget = useRef(false);
   const targetVec = useMemo(() => new THREE.Vector3(1.5, 0, 0), []);
