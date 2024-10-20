@@ -4,6 +4,12 @@
 
 This project is inspired by the retro graphics of the Chip-8 system and serves as a demonstration of my Chip-8 emulator [repo](https://github.com/berke-bakar/chip8-emulator).
 
+![chip8emulator vercel app_ (2)](https://github.com/user-attachments/assets/d9dd516a-6106-4771-969a-d97957e33953)
+![chip8emulator vercel app_ (3)](https://github.com/user-attachments/assets/d4be195f-151b-4e9e-ab4a-f0692824b15b)
+![chip8emulator vercel app_ (1)](https://github.com/user-attachments/assets/9b96f392-66e5-4dc8-9c8d-165f14f0309e)
+
+![chip8emulator vercel app_](https://github.com/user-attachments/assets/e05edbc7-b48e-4d52-9836-759e2e3246a0)
+
 ## How it Works
 
 * The **WASM output** of the Chip-8 emulator project is imported into a web worker.
